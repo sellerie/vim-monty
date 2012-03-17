@@ -1,0 +1,4 @@
+glob:*.pyc
+glob:*.orig
+glob:tests/__pycache__/*
+

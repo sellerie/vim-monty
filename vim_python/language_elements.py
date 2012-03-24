@@ -66,13 +66,13 @@ class LanguageElement(object):
             return self.free_accessibles()
 
     def bounded_accessibles(self):
-        """Return all bounded accessibles of this element.
+        """Return all bounded accessible of this element.
         """
         raise NotImplementedError('Implement %s.bounded_accessibles' %
                                   class_name(self.astng_element))
 
     def free_accessibles(self):
-        """Return all free accessibles of this module
+        """Return all free accessible of this module
         """
         accessibles = []
         for name, accessible in self.astng_element.items():

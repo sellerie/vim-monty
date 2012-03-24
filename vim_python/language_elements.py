@@ -2,6 +2,7 @@
 
 The classes contain sum analytic methods used on completion.
 """
+from logger import log
 
 
 def class_name(astng_element):
@@ -114,4 +115,24 @@ class LeClass(LanguageElement):
     """
     def free_accessibles(self):
         return self.parent().free_accessibles()
+
+    def bounded_accessibles(self):
+        result = set(LanguageElement.create(astng_element, name=name)
+                     for name, astng_element in self.astng_element.items())
+        for base in self.astng_element.bases:
+            base_element = LanguageElement.create(base)
+            result.update(base_element.bounded_accessibles())
+        return list(result)
+
+
+class LeName(LanguageElement):
+    def infer(self):
+        infereds = self.astng_element.infered()
+        if infereds:
+            return LanguageElement.create(infereds[0])
+        log("Could not infer name: %s" % self.name())
+        return LeNoneType(None)
+    
+    def bounded_accessibles(self):
+        return self.infer().bounded_accessibles()
 

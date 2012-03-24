@@ -48,7 +48,7 @@ class Source(object):
         """Calc the context element marked by the given line and column number.
         """
         context_string = self.context_string(line, linenumber, column)
-        module = self.analyze(linenumber)
+        module = self.analyze(linenumber - 1)
         scope = module.scope(linenumber)
         return scope.lookup(context_string)
 
@@ -64,6 +64,16 @@ class Source(object):
             return []
 
 
+def indention_by_line(line):
+    indention = ''
+    for char in line:
+        if char == ' ' or char == '\n':
+            indention += char
+        else:
+            break
+    return indention
+
+
 class PyModule(object):
     BUILDER = ASTNGBuilder()
 
@@ -76,12 +86,20 @@ class PyModule(object):
             if a_scope.fromlineno <= linenumber <= a_scope.tolineno:
                 scope = self.scope(linenumber, a_scope)
                 break
+        if isinstance(scope, language_elements.LanguageElement):
+            return scope
         return language_elements.LanguageElement.create(scope)
 
     @classmethod
     def by_source(cls, source, linenumber=None):
         try:
-            module = cls.BUILDER.string_build(source)
+            if linenumber is not None:
+                source_lines = source.split('\n')
+                original_line = source_lines[linenumber]
+                safe_line = indention_by_line(original_line) + 'pass'
+                log(safe_line)
+                source_lines[linenumber] = safe_line
+            module = cls.BUILDER.string_build('\n'.join(source_lines))
         except Exception, exc:
             if linenumber is not None:
                 raise NotImplementedError("TODO")

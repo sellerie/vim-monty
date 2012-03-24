@@ -164,6 +164,22 @@ class LeInstance(LanguageElement):
         raise RuntimeError(class_lookup)
 
 
+class LeConst(LanguageElement):
+    from logilab.astng.builder import ASTNGBuilder
+    from logilab.common.compat import builtins
+    BUILTINS = ASTNGBuilder().inspect_build(builtins)
+
+    def bounded_accessibles(self):
+        name = self.astng_element.pytype()
+        if name.startswith('__builtin__'):
+            name = name.split('.')[-1]
+            builtin_astng_element = self.BUILTINS[name]
+            element = LanguageElement.create(builtin_astng_element, name=name)
+            return element.bounded_accessibles()
+        raise RuntimeError("The const type %s is no builtin." %
+                           self.astng_elemnt)
+
+
 class LeName(LanguageElement):
     def infer(self):
         infereds = self.astng_element.infered()

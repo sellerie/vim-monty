@@ -2,10 +2,17 @@ from logger import log
 
 
 def class_name(astng_element):
+    """Returns the name of the special implementation class.
+    """
     return "Le%s" % astng_element.__class__.__name__
 
 
 class LanguageElement(object):
+    """A instance of this class represents a python language element.
+
+    This module contains some special implementations of this class for some
+    language elements like ``LeClass`` for classes.
+    """
     def __init__(self, astng_element, context_string="", name=None):
         self.astng_element = astng_element
         self.context_string = context_string
@@ -13,6 +20,10 @@ class LanguageElement(object):
 
     @classmethod
     def create(cls, astng_element, *args, **kwargs):
+        """Creates a LanguageElement instance for the given astng_element.
+
+        Creates the special class, LanguageElement is only the fallback.
+        """
         klass = globals().get(class_name(astng_element), cls)
         return klass(astng_element, *args, **kwargs)
 
@@ -71,11 +82,15 @@ class LanguageElement(object):
         pass
 
     def name(self):
+        """Returns the name of this element.
+        """
         if self._name:
             return self._name
         return self.astng_element.name
 
     def startswith(self, init_string):
+        """Like str.startswith on self.name().
+        """
         return self.name().startswith(init_string)
 
     def completion_entry(self):
@@ -85,11 +100,15 @@ class LanguageElement(object):
 
 
 class LeNoneType(LanguageElement):
+    """Language element if the element can not be found.
+    """
     def free_accessibles(self):
         return []
 
 
 class LeClass(LanguageElement):
+    """Language element of class elements.
+    """
     def free_accessibles(self):
         return self.parent().free_accessibles()
 

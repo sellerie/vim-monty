@@ -1,4 +1,7 @@
-from logger import log
+"""This module contains classes to represent language elements of python.
+
+The classes contain sum analytic methods used on completion.
+"""
 
 
 def class_name(astng_element):
@@ -42,8 +45,8 @@ class LanguageElement(object):
         See 'Source.context_string'.
         """
         context = self.astng_element
-        for p in context_string.split('.'):
-            scope, contexts = context.lookup(p)
+        for path_element in context_string.split('.'):
+            _scope, contexts = context.lookup(path_element)
             if contexts:
                 # TODO: multiple names
                 context = contexts[0]

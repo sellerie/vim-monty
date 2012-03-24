@@ -2,25 +2,18 @@
 """
 from logilab.astng.builder import ASTNGBuilder
 
+import language_elements
 
-class LanguageElement(object):
-    def lookup(self, context_string):
-        """Evaluate the given context string on this element.
 
-        A context string is a path like 'os.path.dirname'.
-        See 'Source.context_string'.
-        """
-        pass
-
-    def accessibles(self):
-        """Return a list of every accessible sub of this language element.
-        """
-        pass
-
-    def implementaion(self):
-        """Returns the filename (path) and the line number of this element.
-        """
-        pass
+def reload_submodules():
+    """Reload every imported module to simplify development.
+    """
+    for name, value in globals().iteritems():
+        if(not name.startswith('__') and not name.endswith('__') and
+           value.__class__.__name__ == 'module'):
+            if hasattr(value, 'reload_submodules'):
+                value.reload_submodules()
+            reload(value)
 
 
 class Source(object):
@@ -34,34 +27,56 @@ class Source(object):
         """
         return PyModule.by_source(self.source, *args, **kwargs)
 
-    def context_string(self, linenumber, column):
+    def context_string(self, line, linenumber, column):
         """Return the context string marked by the given line and column number.
 
         A context string is a path like 'os.path.dirname'.
         """
-        pass
+        column = min(column, len(line))
+        start_index = column
+        while start_index > 0:
+            start_index -= 1
+            if line[start_index] in ' \t;([{:,=<>':
+                start_index += 1
+                break
+        string_of_interest = line[start_index:column]
+        if string_of_interest and string_of_interest[-1] == '.':
+            return string_of_interest[:-1]
+        return string_of_interest
 
-    def context(self, linenumber, column):
-        """Calc th context element marked by the given line and column number.
+    def context(self, line, linenumber, column):
+        """Calc the context element marked by the given line and column number.
         """
+        context_string = self.context_string(line, linenumber, column)
         module = self.analyze(linenumber)
         scope = module.scope(linenumber)
-        context_string = self.context_string(linenumber, column)
         return scope.lookup(context_string)
+
+    def completion(self, line, linenumber, column, base):
+        try:
+            accessibles = self.context(line, linenumber, column).accessibles()
+            return [accessible.completion_entry() for accessible in accessibles
+                    if accessible.startswith(base)]
+        except Exception, exc:
+            log(exc)
+            import traceback
+            log(traceback.format_exc())
+            return []
 
 
 class PyModule(object):
     BUILDER = ASTNGBuilder()
 
     def __init__(self, module):
-        self.module = module
+        self.astng_module = module
 
     def scope(self, linenumber, scope=None):
-        scope = scope or self.module
+        scope = scope or self.astng_module
         for a_scope in scope.values():
             if a_scope.fromlineno <= linenumber <= a_scope.tolineno:
-                return self.scope(linenumber, a_scope)
-        return scope
+                scope = self.scope(linenumber, a_scope)
+                break
+        return language_elements.LanguageElement.create(scope)
 
     @classmethod
     def by_source(cls, source, linenumber=None):

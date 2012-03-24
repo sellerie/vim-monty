@@ -54,7 +54,8 @@ class Source(object):
 
     def completion(self, line, linenumber, column, base):
         try:
-            accessibles = self.context(line, linenumber, column).accessibles()
+            context = self.context(line, linenumber, column)
+            accessibles = sorted(context.accessibles())
             return [accessible.completion_entry() for accessible in accessibles
                     if accessible.startswith(base)]
         except Exception, exc:

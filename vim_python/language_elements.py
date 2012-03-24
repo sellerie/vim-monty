@@ -39,6 +39,23 @@ class LanguageElement(object):
         """
         return LanguageElement.create(self.astng_element.parent)
 
+    def __cmp__(self, other):
+        if self.startswith('__') and not other.startswith('__'):
+            return 1
+        if not self.startswith('__') and other.startswith('__'):
+            return -1
+        if self.startswith('_') and not other.startswith('_'):
+            return 1
+        if not self.startswith('_') and other.startswith('_'):
+            return -1
+        return cmp(self.name(), other.name())
+
+    def __eq__(self, other):
+        return self.name() == other.name()
+
+    def __hash__(self):
+        return hash(self.name())
+
     def lookup(self, context_string):
         """Evaluate the given context string on this element.
 

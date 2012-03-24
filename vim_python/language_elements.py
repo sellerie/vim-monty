@@ -18,13 +18,13 @@ class LanguageElement(object):
         self.context_string = context_string
         self._name = name
 
-    @classmethod
-    def create(cls, astng_element, *args, **kwargs):
+    @staticmethod
+    def create(astng_element, *args, **kwargs):
         """Creates a LanguageElement instance for the given astng_element.
 
         Creates the special class, LanguageElement is only the fallback.
         """
-        klass = globals().get(class_name(astng_element), cls)
+        klass = globals().get(class_name(astng_element), LanguageElement)
         return klass(astng_element, *args, **kwargs)
 
     def parent(self):

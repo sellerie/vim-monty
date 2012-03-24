@@ -127,6 +127,23 @@ class LeNoneType(LanguageElement):
         return []
 
 
+class LeModule(LanguageElement):
+    def bounded_accessibles(self):
+        return self.free_accessibles()
+
+
+class LeImport(LanguageElement):
+    def import_path(self):
+        return self.astng_element.names[0][0]
+
+    def imported(self):
+        astng_imported = self.astng_element.do_import_module(self.import_path())
+        return LanguageElement.create(astng_imported)
+
+    def bounded_accessibles(self):
+        return self.imported().bounded_accessibles()
+
+
 class LeClass(LanguageElement):
     """Language element of class elements.
     """

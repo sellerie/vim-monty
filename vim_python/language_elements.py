@@ -141,6 +141,28 @@ class LeClass(LanguageElement):
             result.update(base_element.bounded_accessibles())
         return list(result)
 
+    def instance_attributes(self):
+        result = []
+        for name, values in self.astng_element.instance_attrs.iteritems():
+            result.append(LanguageElement.create(values[0], name=name))
+        return result
+
+    def bounded_accessibles_instance(self):
+        return self.instance_attributes() + self.bounded_accessibles()
+
+
+class LeInstance(LanguageElement):
+    def bounded_accessibles(self):
+        class_name = self.astng_element.pytype()
+        if class_name[0] == '.':
+            class_name = class_name[1:]
+        class_lookup = self.astng_element.lookup(class_name)
+        if len(class_lookup) == 2 and len(class_lookup[1]) == 1:
+            the_class_astng_element = class_lookup[1][0]
+            the_class = LeClass(the_class_astng_element)
+            return the_class.bounded_accessibles_instance()
+        raise RuntimeError(class_lookup)
+
 
 class LeName(LanguageElement):
     def infer(self):
@@ -152,4 +174,7 @@ class LeName(LanguageElement):
     
     def bounded_accessibles(self):
         return self.infer().bounded_accessibles()
+
+class LeAssName(LeName):
+    pass
 

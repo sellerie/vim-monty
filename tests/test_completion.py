@@ -62,3 +62,10 @@ def test_deep():
     compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
     assert '__add__' in compls
 
+
+def test_instance():
+    line = "A_INSTANCE."
+    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    for instance_element in AModule.A_CLASS_ELEMENTS + ['_instance_attr']:
+        assert instance_element in compls
+

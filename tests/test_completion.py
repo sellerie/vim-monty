@@ -69,3 +69,13 @@ def test_instance():
     for instance_element in AModule.A_CLASS_ELEMENTS + ['_instance_attr']:
         assert instance_element in compls
 
+
+def test_from():
+    line = 'BClass.'
+    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    assert 'b_class_method' in compls
+
+    python_code = 'from a_module import BClass\n\n'
+    compls = Source(python_code).completion(line, 2, len(line), '')
+    assert 'b_class_method' in compls
+

@@ -75,7 +75,14 @@ def test_from():
     compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
     assert 'b_class_method' in compls
 
+    # Test of a deeper from import, BClass is also imported by 'a_module'.
     python_code = 'from a_module import BClass\n\n'
     compls = Source(python_code).completion(line, 2, len(line), '')
     assert 'b_class_method' in compls
+
+
+def test_builtin():
+    line = 'A_STRING.'
+    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    assert 'startswith' in compls
 

@@ -2,6 +2,8 @@
 
 The classes contain sum analytic methods used on completion.
 """
+from logilab.astng.exceptions import InferenceError
+
 from logger import log
 
 
@@ -37,7 +39,8 @@ class LanguageElement(object):
         The parent is the class for a method or the module for a
         module function, ...
         """
-        return LanguageElement.create(self.astng_element.parent)
+        return LanguageElement.create(self.astng_element.parent,
+                                      context_string=self.context_string)
 
     def __cmp__(self, other):
         if self.startswith('__') and not other.startswith('__'):
@@ -73,7 +76,8 @@ class LanguageElement(object):
                     context = context.do_import_module(module_name)
             else:
                 return self
-        return LanguageElement.create(context, context_string)
+        return LanguageElement.create(context,
+                                      context_string=context_string)
 
     def accessibles(self):
         """Return a list of every accessible sub of this language element.
@@ -94,7 +98,8 @@ class LanguageElement(object):
         """
         accessibles = []
         for name, accessible in self.astng_element.items():
-            accessibles.append(LanguageElement.create(accessible, name=name))
+            accessibles.append(LanguageElement.create(accessible, name=name,
+                                            context_string=self.context_string))
         return accessibles + self.parent().free_accessibles()
 
     def implementaion(self):
@@ -138,8 +143,25 @@ class LeImport(LanguageElement):
 
     def imported(self):
         astng_imported = self.astng_element.do_import_module(self.import_path())
-        return LanguageElement.create(astng_imported)
+        return LanguageElement.create(astng_imported,
+                                      context_string=self.context_string)
 
+    def bounded_accessibles(self):
+        return self.imported().bounded_accessibles()
+
+
+class LeFrom(LanguageElement):
+    def imported(self):
+        name = self.context_string.split('.')[-1]
+        module_name = self.astng_element.modname
+        try:
+            import_path = module_name + '.' + name
+            astng_element = self.astng_element.do_import_module(import_path)
+        except InferenceError:
+            imported_module = self.astng_element.do_import_module(module_name)
+            astng_element = imported_module[name]
+        return LanguageElement.create(astng_element, name=name,
+                                      context_string=self.context_string)
     def bounded_accessibles(self):
         return self.imported().bounded_accessibles()
 
@@ -151,17 +173,20 @@ class LeClass(LanguageElement):
         return self.parent().free_accessibles()
 
     def bounded_accessibles(self):
-        result = set(LanguageElement.create(astng_element, name=name)
+        result = set(LanguageElement.create(astng_element, name=name,
+                                            context_string=self.context_string)
                      for name, astng_element in self.astng_element.items())
         for base in self.astng_element.bases:
-            base_element = LanguageElement.create(base)
+            base_element = LanguageElement.create(base,
+                                             context_string=self.context_string)
             result.update(base_element.bounded_accessibles())
         return list(result)
 
     def instance_attributes(self):
         result = []
         for name, values in self.astng_element.instance_attrs.iteritems():
-            result.append(LanguageElement.create(values[0], name=name))
+            result.append(LanguageElement.create(values[0], name=name,
+                                            context_string=self.context_string))
         return result
 
     def bounded_accessibles_instance(self):
@@ -191,7 +216,8 @@ class LeConst(LanguageElement):
         if name.startswith('__builtin__'):
             name = name.split('.')[-1]
             builtin_astng_element = self.BUILTINS[name]
-            element = LanguageElement.create(builtin_astng_element, name=name)
+            element = LanguageElement.create(builtin_astng_element, name=name,
+                                             context_string=self.context_string)
             return element.bounded_accessibles()
         raise RuntimeError("The const type %s is no builtin." %
                            self.astng_elemnt)
@@ -201,7 +227,8 @@ class LeName(LanguageElement):
     def infer(self):
         infereds = self.astng_element.infered()
         if infereds:
-            return LanguageElement.create(infereds[0])
+            return LanguageElement.create(infereds[0],
+                                          context_string=self.context_string)
         log("Could not infer name: %s" % self.name())
         return LeNoneType(None)
     

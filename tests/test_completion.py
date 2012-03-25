@@ -27,10 +27,17 @@ class AModule(object):
                'BClass']
     A_CLASS_ELEMENTS = ['CLASS_VAR', 'a_method', 'b_class_method', '__init__']
 
+    @staticmethod
+    def completion(line, linenumber=None, column=None, base=''):
+        if linenumber is None:
+            linenumber = AModule.LAST_LINE
+        if column is None:
+            column = len(line)
+        return AModule.SOURCE.completion(line, linenumber, column, base)
+
 
 def test_module():
-    compls = AModule.SOURCE.completion('', AModule.LAST_LINE, 0, '')
-    assert AModule.GLOBALS == compls
+    assert AModule.GLOBALS == AModule.completion('')
 
 
 def test_imported():
@@ -41,38 +48,34 @@ def test_imported():
 
 def test_method_scope():
     method_variables = ['a_var', 'arg1', 'arg2', 'self']
-    compls = AModule.SOURCE.completion('        ', 16, 8, '')
+    compls = AModule.completion('        ', 16)
     assert sorted(method_variables + AModule.GLOBALS) == compls
 
 
 def test_class():
-    line = 'AClass.'
-    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    compls = AModule.completion("AClass.")
     for class_element in AModule.A_CLASS_ELEMENTS:
         assert class_element in compls
 
-    line = 'A_CLASS.'
-    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    compls = AModule.completion("A_CLASS.")
     for class_element in AModule.A_CLASS_ELEMENTS:
         assert class_element in compls
 
 
 def test_deep():
-    line = "AClass.CLASS_VAR."
-    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    compls = AModule.completion("AClass.CLASS_VAR.")
     assert '__add__' in compls
 
 
 def test_instance():
-    line = "A_INSTANCE."
-    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    compls = AModule.completion("A_INSTANCE.")
     for instance_element in AModule.A_CLASS_ELEMENTS + ['_instance_attr']:
         assert instance_element in compls
 
 
 def test_from():
     line = 'BClass.'
-    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    compls = AModule.completion(line)
     assert 'b_class_method' in compls
 
     # Test of a deeper from import, BClass is also imported by 'a_module'.
@@ -82,7 +85,6 @@ def test_from():
 
 
 def test_builtin():
-    line = 'A_STRING.'
-    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    compls = AModule.completion("A_STRING.")
     assert 'startswith' in compls
 

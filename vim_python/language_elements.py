@@ -198,12 +198,13 @@ class LeInstance(LanguageElement):
         class_name = self.astng_element.pytype()
         if class_name[0] == '.':
             class_name = class_name[1:]
-        class_lookup = self.astng_element.lookup(class_name)
-        if len(class_lookup) == 2 and len(class_lookup[1]) == 1:
-            the_class_astng_element = class_lookup[1][0]
-            the_class = LeClass(the_class_astng_element)
-            return the_class.bounded_accessibles_instance()
-        raise RuntimeError(class_lookup)
+        path_elements = class_name.split('.')
+        short_class_name = path_elements[-1]
+        astng_module = self.astng_element.parent
+        the_class_astng_element = astng_module[short_class_name]
+        the_class = LeClass(the_class_astng_element,
+                            context_string=self.context_string)
+        return the_class.bounded_accessibles_instance()
 
 
 class LeConst(LanguageElement):

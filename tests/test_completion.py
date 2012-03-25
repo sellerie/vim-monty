@@ -56,3 +56,9 @@ def test_class():
     for class_element in AModule.A_CLASS_ELEMENTS:
         assert class_element in compls
 
+
+def test_deep():
+    line = "AClass.CLASS_VAR."
+    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    assert '__add__' in compls
+

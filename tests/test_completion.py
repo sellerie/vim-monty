@@ -89,3 +89,9 @@ def test_builtin():
     compls = AModule.completion("A_STRING.")
     assert 'startswith' in compls
 
+
+def test_import_line():
+    line = "import vim_python."
+    compls = Source("\n\n").completion(line, 1, len(line), '')
+    assert ['completionable', 'language_elements', 'logger', 'source'] == compls
+

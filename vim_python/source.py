@@ -1,8 +1,12 @@
-"""Interface to simplify source code analysis with astng.
+"""Interface to simplify source code analysis with logilab astng.
 """
+import os
+
 from logilab.astng.builder import ASTNGBuilder
 
 import language_elements
+import completionable
+from logger import log
 
 
 def reload_submodules():
@@ -52,10 +56,21 @@ class Source(object):
         scope = module.scope(linenumber)
         return scope.lookup(context_string)
 
+    def import_completion(self, line, linenumber, column):
+        import_path = self.context_string(line, linenumber, column)
+        module = PyModule.by_module_path(import_path)
+        return list(module.package_modules())
+    
     def completion(self, line, linenumber, column, base):
         try:
-            context = self.context(line, linenumber, column)
-            accessibles = sorted(context.accessibles())
+            tokens = line.strip().split()
+            if tokens and (tokens[0] == 'import' or
+                           (tokens[0] == 'from' and len(tokens) < 3)):
+                accessibles = self.import_completion(line, linenumber, column)
+            else:
+                context = self.context(line, linenumber, column)
+                accessibles = context.accessibles()
+            accessibles.sort()
             return [accessible.completion_entry() for accessible in accessibles
                     if accessible.startswith(base)]
         except Exception, exc:
@@ -107,4 +122,22 @@ class PyModule(object):
             else:
                 raise exc
         return cls(module)
+
+    @classmethod
+    def by_module_path(cls, module_path):
+        helper_module = cls.BUILDER.string_build('') # TODO: bad
+        module = helper_module.import_module(module_path)
+        return cls(module)
+
+    def package_modules(self):
+        result = set()
+        if self.astng_module.package:
+            package_dir = os.path.dirname(self.astng_module.file)
+            for module_path in os.listdir(package_dir):
+                module_file = os.path.basename(module_path)
+                module_name, extension = os.path.splitext(module_path)
+                if(extension in ['.py', '.pyc', '.pyo', '.pyw'] and
+                   module_name != '__init__'):
+                    result.add(completionable.Completionable(module_name))
+        return result
 

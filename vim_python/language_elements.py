@@ -4,7 +4,19 @@ The classes contain some analytic methods used on completion.
 """
 from logilab.astng.exceptions import InferenceError
 
+import completionable
 from logger import log
+
+
+def reload_submodules():
+    """Reload every imported module to simplify development.
+    """
+    for name, value in globals().iteritems():
+        if(not name.startswith('__') and not name.endswith('__') and
+           value.__class__.__name__ == 'module'):
+            if hasattr(value, 'reload_submodules'):
+                value.reload_submodules()
+            reload(value)
 
 
 def le_class_name(astng_element):
@@ -13,16 +25,16 @@ def le_class_name(astng_element):
     return "Le%s" % astng_element.__class__.__name__
 
 
-class LanguageElement(object):
+class LanguageElement(completionable.Completionable):
     """A instance of this class represents a python language element.
 
     This module contains some special implementations of this class for some
     language elements like ``LeClass`` for classes.
     """
     def __init__(self, astng_element, context_string="", name=None):
+        super(LanguageElement, self).__init__(name)
         self.astng_element = astng_element
         self.context_string = context_string
-        self._name = name
 
     @staticmethod
     def create(astng_element, *args, **kwargs):
@@ -41,23 +53,6 @@ class LanguageElement(object):
         """
         return LanguageElement.create(self.astng_element.parent,
                                       context_string=self.context_string)
-
-    def __cmp__(self, other):
-        if self.startswith('__') and not other.startswith('__'):
-            return 1
-        if not self.startswith('__') and other.startswith('__'):
-            return -1
-        if self.startswith('_') and not other.startswith('_'):
-            return 1
-        if not self.startswith('_') and other.startswith('_'):
-            return -1
-        return cmp(self.name(), other.name())
-
-    def __eq__(self, other):
-        return self.name() == other.name()
-
-    def __hash__(self):
-        return hash(self.name())
 
     def lookup(self, context_string):
         """Evaluate the given context string on this element.
@@ -113,16 +108,6 @@ class LanguageElement(object):
         if self._name:
             return self._name
         return self.astng_element.name
-
-    def startswith(self, init_string):
-        """Like str.startswith on self.name().
-        """
-        return self.name().startswith(init_string)
-
-    def completion_entry(self):
-        """Returns the entry for the vim completion menu.
-        """
-        return self.name()
 
 
 class LeNoneType(LanguageElement):

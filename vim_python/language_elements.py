@@ -1,13 +1,13 @@
 """This module contains classes to represent language elements of python.
 
-The classes contain sum analytic methods used on completion.
+The classes contain some analytic methods used on completion.
 """
 from logilab.astng.exceptions import InferenceError
 
 from logger import log
 
 
-def class_name(astng_element):
+def le_class_name(astng_element):
     """Returns the name of the special implementation class.
     """
     return "Le%s" % astng_element.__class__.__name__
@@ -30,7 +30,7 @@ class LanguageElement(object):
 
         Creates the special class, LanguageElement is only the fallback.
         """
-        klass = globals().get(class_name(astng_element), LanguageElement)
+        klass = globals().get(le_class_name(astng_element), LanguageElement)
         return klass(astng_element, *args, **kwargs)
 
     def parent(self):
@@ -91,7 +91,7 @@ class LanguageElement(object):
         """Return all bounded accessible of this element.
         """
         raise NotImplementedError('Implement %s.bounded_accessibles' %
-                                  class_name(self.astng_element))
+                                  le_class_name(self.astng_element))
 
     def free_accessibles(self):
         """Return all free accessible of this module
@@ -131,17 +131,28 @@ class LeNoneType(LanguageElement):
     def free_accessibles(self):
         return []
 
+    def bounded_accessibles(self):
+        return []
+
 
 class LeModule(LanguageElement):
+    """This language element represent a python module.
+    """
     def bounded_accessibles(self):
         return self.free_accessibles()
 
 
 class LeImport(LanguageElement):
+    """This language element represent a python import command.
+    """
     def import_path(self):
+        """Returns the import path.
+        """
         return self.astng_element.names[0][0]
 
     def imported(self):
+        """Imports this module.
+        """
         astng_imported = self.astng_element.do_import_module(self.import_path())
         return LanguageElement.create(astng_imported,
                                       context_string=self.context_string)
@@ -151,7 +162,11 @@ class LeImport(LanguageElement):
 
 
 class LeFrom(LanguageElement):
+    """This language element represent a element imported with from
+    """
     def imported(self):
+        """Returns the imported language element.
+        """
         name = self.context_string.split('.')[-1]
         module_name = self.astng_element.modname
         try:
@@ -183,6 +198,8 @@ class LeClass(LanguageElement):
         return list(result)
 
     def instance_attributes(self):
+        """Returns the instance attributes of this class.
+        """
         result = []
         for name, values in self.astng_element.instance_attrs.iteritems():
             result.append(LanguageElement.create(values[0], name=name,
@@ -190,10 +207,14 @@ class LeClass(LanguageElement):
         return result
 
     def bounded_accessibles_instance(self):
+        """Returns the bounded accessible of a instance of this class.
+        """
         return self.instance_attributes() + self.bounded_accessibles()
 
 
 class LeInstance(LanguageElement):
+    """This language element represent a class instantiation.
+    """
     def bounded_accessibles(self):
         class_name = self.astng_element.pytype()
         if class_name[0] == '.':
@@ -208,6 +229,10 @@ class LeInstance(LanguageElement):
 
 
 class LeConst(LanguageElement):
+    """This language element represent a constant element.
+
+    At this point I think this can only be a builtin.
+    """
     from logilab.astng.builder import ASTNGBuilder
     from logilab.common.compat import builtins
     BUILTINS = ASTNGBuilder().inspect_build(builtins)
@@ -221,11 +246,15 @@ class LeConst(LanguageElement):
                                              context_string=self.context_string)
             return element.bounded_accessibles()
         raise RuntimeError("The const type %s is no builtin." %
-                           self.astng_elemnt)
+                           self.astng_element)
 
 
 class LeName(LanguageElement):
+    """This is simply a python variable.
+    """
     def infer(self):
+        """Find a more specific representation of the variable content.
+        """
         infereds = self.astng_element.infered()
         if infereds:
             return LanguageElement.create(infereds[0],
@@ -236,6 +265,9 @@ class LeName(LanguageElement):
     def bounded_accessibles(self):
         return self.infer().bounded_accessibles()
 
+
 class LeAssName(LeName):
+    """This is like 'LeName' but represent a variable assignment.
+    """
     pass
 

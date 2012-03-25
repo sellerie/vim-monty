@@ -292,5 +292,4 @@ class LeName(LanguageElement):
 class LeAssName(LeName):
     """This is like 'LeName' but represent a variable assignment.
     """
-    pass
 

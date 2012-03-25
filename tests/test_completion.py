@@ -37,3 +37,9 @@ def test_imported():
     compls = Source(python_code).completion('a_module.', 2, 8, '')
     assert AModule.GLOBALS == compls
 
+
+def test_method_variables():
+    method_variables = ['a_var', 'arg1', 'arg2', 'self']
+    compls = AModule.SOURCE.completion('        ', 16, 8, '')
+    assert sorted(method_variables + AModule.GLOBALS) == compls
+

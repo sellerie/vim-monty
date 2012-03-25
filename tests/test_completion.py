@@ -69,7 +69,8 @@ def test_deep():
 
 def test_instance():
     compls = AModule.completion("A_INSTANCE.")
-    for instance_element in AModule.A_CLASS_ELEMENTS + ['_instance_attr']:
+    instance_elements = ['_instance_attr', '_b_attr']
+    for instance_element in AModule.A_CLASS_ELEMENTS + instance_elements:
         assert instance_element in compls
 
 

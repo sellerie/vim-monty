@@ -184,27 +184,40 @@ class LeFrom(LanguageElement):
 class LeClass(LanguageElement):
     """Language element of class elements.
     """
+    def __init__(self, *args, **kwargs):
+        super(LeClass, self).__init__(*args, **kwargs)
+        self._bases = None
+
     def free_accessibles(self):
         return self.parent().free_accessibles()
+
+    def base_classes(self):
+        """Returns language elements of base classes of this class.
+        """
+        if self._bases is None:
+            self._bases = [LanguageElement.create(base,
+                                             context_string=self.context_string)
+                           for base in self.astng_element.bases]
+        return self._bases
 
     def bounded_accessibles(self):
         result = set(LanguageElement.create(astng_element, name=name,
                                             context_string=self.context_string)
                      for name, astng_element in self.astng_element.items())
-        for base in self.astng_element.bases:
-            base_element = LanguageElement.create(base,
-                                             context_string=self.context_string)
-            result.update(base_element.bounded_accessibles())
+        for base_class in self.base_classes():
+            result.update(base_class.bounded_accessibles())
         return list(result)
 
     def instance_attributes(self):
         """Returns the instance attributes of this class.
         """
-        result = []
+        result = set()
         for name, values in self.astng_element.instance_attrs.iteritems():
-            result.append(LanguageElement.create(values[0], name=name,
+            result.add(LanguageElement.create(values[0], name=name,
                                             context_string=self.context_string))
-        return result
+        for base_class in self.base_classes():
+            result.update(base_class.instance_attributes())
+        return list(result)
 
     def bounded_accessibles_instance(self):
         """Returns the bounded accessible of a instance of this class.
@@ -264,6 +277,11 @@ class LeName(LanguageElement):
     
     def bounded_accessibles(self):
         return self.infer().bounded_accessibles()
+
+    def instance_attributes(self):
+        """Returns the instance attributes of this class.
+        """
+        return self.infer().instance_attributes()
 
 
 class LeAssName(LeName):

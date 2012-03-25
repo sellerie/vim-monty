@@ -2,5 +2,5 @@
 
 class BClass(object):
     def b_class_method(self):
-        pass
+        self._b_attr = 1
 

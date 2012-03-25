@@ -59,7 +59,9 @@ class Source(object):
     def import_completion(self, line, linenumber, column):
         import_path = self.context_string(line, linenumber, column)
         module = PyModule.by_module_path(import_path)
-        return list(module.package_modules())
+        accessibles = module.package_modules()
+        accessibles.update(module.accessible_modules())
+        return list(accessibles)
     
     def completion(self, line, linenumber, column, base):
         try:
@@ -141,3 +143,10 @@ class PyModule(object):
                     result.add(completionable.Completionable(module_name))
         return result
 
+    def accessible_modules(self):
+        module = language_elements.LanguageElement.create(self.astng_module)
+        result = set()
+        for accessible in module.accessibles():
+            if accessible.__class__.__name__ in ('LeModule', 'LeImport'):
+                result.add(accessible)
+        return result

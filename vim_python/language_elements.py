@@ -228,7 +228,10 @@ class LeClass(LanguageElement):
 class LeInstance(LanguageElement):
     """This language element represent a class instantiation.
     """
-    def bounded_accessibles(self):
+
+    def get_class(self):
+        """Returns the language element of the class for this instance.
+        """
         class_name = self.astng_element.pytype()
         if class_name[0] == '.':
             class_name = class_name[1:]
@@ -236,9 +239,11 @@ class LeInstance(LanguageElement):
         short_class_name = path_elements[-1]
         astng_module = self.astng_element.parent
         the_class_astng_element = astng_module[short_class_name]
-        the_class = LeClass(the_class_astng_element,
-                            context_string=self.context_string)
-        return the_class.bounded_accessibles_instance()
+        return LeClass(the_class_astng_element,
+                       context_string=self.context_string)
+
+    def bounded_accessibles(self):
+        return self.get_class().bounded_accessibles_instance()
 
 
 class LeConst(LanguageElement):

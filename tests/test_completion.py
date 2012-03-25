@@ -25,6 +25,7 @@ class AModule(object):
     LAST_LINE = len(SOURCE_STR.split('\n')) - 1
     GLOBALS = ['AClass', 'A_CLASS', 'A_INSTANCE', 'A_INTEGER', 'A_STRING',
                'BClass']
+    A_CLASS_ELEMENTS = ['CLASS_VAR', 'a_method', 'b_class_method', '__init__']
 
 
 def test_module():
@@ -38,8 +39,20 @@ def test_imported():
     assert AModule.GLOBALS == compls
 
 
-def test_method_variables():
+def test_method_scope():
     method_variables = ['a_var', 'arg1', 'arg2', 'self']
     compls = AModule.SOURCE.completion('        ', 16, 8, '')
     assert sorted(method_variables + AModule.GLOBALS) == compls
+
+
+def test_class():
+    line = 'AClass.'
+    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    for class_element in AModule.A_CLASS_ELEMENTS:
+        assert class_element in compls
+
+    line = 'A_CLASS.'
+    compls = AModule.SOURCE.completion(line, AModule.LAST_LINE, len(line), '')
+    for class_element in AModule.A_CLASS_ELEMENTS:
+        assert class_element in compls
 

@@ -92,6 +92,20 @@ def indention_by_line(line):
     return indention
 
 
+def is_module_or_package(module_path):
+    module_extensions = ('.py', '.pyc', '.pyo', '.pyw')
+    module_file = os.path.basename(module_path)
+    module_name, extension = os.path.splitext(module_file)
+    if os.path.isdir(module_path):
+        for module_extension in module_extensions:
+            if '__init__' + module_extension in os.listdir(module_path):
+                return True, module_name
+    else:
+        if module_name != '__init__' and extension in module_extensions:
+            return True, module_name
+    return False, None
+
+
 class PyModule(object):
     BUILDER = ASTNGBuilder()
 
@@ -135,11 +149,10 @@ class PyModule(object):
         result = set()
         if self.astng_module.package:
             package_dir = os.path.dirname(self.astng_module.file)
-            for module_path in os.listdir(package_dir):
-                module_file = os.path.basename(module_path)
-                module_name, extension = os.path.splitext(module_path)
-                if(extension in ['.py', '.pyc', '.pyo', '.pyw'] and
-                   module_name != '__init__'):
+            for module_file in os.listdir(package_dir):
+                module_path = os.path.join(package_dir, module_file)
+                is_module, module_name = is_module_or_package(module_path)
+                if is_module:
                     result.add(completionable.Completionable(module_name))
         return result
 

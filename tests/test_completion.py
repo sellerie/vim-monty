@@ -90,12 +90,23 @@ def test_builtin():
     assert 'startswith' in compls
 
 
+PACKAGE_MODULES = ['completionable', 'language_elements', 'logger', 'source']
+
+
 def test_import_line():
     line = "import vim_python."
     compls = Source("\n\n").completion(line, 1, len(line), '')
-    assert ['completionable', 'language_elements', 'logger', 'source'] == compls
+    assert PACKAGE_MODULES == compls
 
     line = "from vim_python."
     compls = Source("\n\n").completion(line, 1, len(line), '')
-    assert ['completionable', 'language_elements', 'logger', 'source'] == compls
+    assert PACKAGE_MODULES == compls
+
+
+def test_from_line():
+    line = "from vim_python import "
+    compls = Source("\n\n").completion(line, 1, len(line), '')
+    expect = sorted(PACKAGE_MODULES +
+                    ['Source', 'find_base_column', 'reload_submodules'])
+    assert expect == compls
 

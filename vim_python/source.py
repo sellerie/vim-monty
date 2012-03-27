@@ -56,19 +56,28 @@ class Source(object):
         scope = module.scope(linenumber)
         return scope.lookup(context_string)
 
-    def import_completion(self, line, linenumber, column):
+    def import_path_completion(self, line, linenumber, column):
         import_path = self.context_string(line, linenumber, column)
         module = PyModule.by_module_path(import_path)
         accessibles = module.package_modules()
         accessibles.update(module.accessible_modules())
         return list(accessibles)
     
+    def import_completion(self, import_path):
+        module = PyModule.by_module_path(import_path)
+        accessibles = module.package_modules()
+        accessibles.update(module.accessibles())
+        return list(accessibles)
+
     def completion(self, line, linenumber, column, base):
         try:
             tokens = line.strip().split()
             if tokens and (tokens[0] == 'import' or
                            (tokens[0] == 'from' and len(tokens) < 3)):
-                accessibles = self.import_completion(line, linenumber, column)
+                accessibles = self.import_path_completion(line, linenumber,
+                                                          column)
+            elif tokens and tokens[0] == 'from' and tokens[2] == 'import':
+                accessibles = self.import_completion(tokens[1])
             else:
                 context = self.context(line, linenumber, column)
                 accessibles = context.accessibles()
@@ -161,9 +170,13 @@ class PyModule(object):
         return result
 
     def accessible_modules(self):
-        module = language_elements.LanguageElement.create(self.astng_module)
         result = set()
-        for accessible in module.accessibles():
+        for accessible in self.accessibles():
             if accessible.__class__.__name__ in ('LeModule', 'LeImport'):
                 result.add(accessible)
         return result
+
+    def accessibles(self):
+        module = language_elements.LanguageElement.create(self.astng_module)
+        return module.accessibles()
+

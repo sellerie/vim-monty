@@ -95,3 +95,7 @@ def test_import_line():
     compls = Source("\n\n").completion(line, 1, len(line), '')
     assert ['completionable', 'language_elements', 'logger', 'source'] == compls
 
+    line = "from vim_python."
+    compls = Source("\n\n").completion(line, 1, len(line), '')
+    assert ['completionable', 'language_elements', 'logger', 'source'] == compls
+

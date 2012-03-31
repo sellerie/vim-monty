@@ -1,4 +1,4 @@
 glob:*.pyc
 glob:*.orig
 glob:tests/__pycache__/*
-
+glob:vim_python.egg-info/*

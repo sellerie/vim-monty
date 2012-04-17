@@ -43,7 +43,6 @@ class LanguageElement(completionable.Completionable):
         Creates the special class, LanguageElement is only the fallback.
         """
         klass = globals().get(le_class_name(astng_element), LanguageElement)
-        log(le_class_name(astng_element))
         return klass(astng_element, *args, **kwargs)
 
     def parent(self):

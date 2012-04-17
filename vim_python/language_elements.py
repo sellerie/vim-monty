@@ -43,6 +43,7 @@ class LanguageElement(completionable.Completionable):
         Creates the special class, LanguageElement is only the fallback.
         """
         klass = globals().get(le_class_name(astng_element), LanguageElement)
+        log(le_class_name(astng_element))
         return klass(astng_element, *args, **kwargs)
 
     def parent(self):
@@ -149,6 +150,10 @@ class LeImport(LanguageElement):
 class LeFrom(LanguageElement):
     """This language element represent a element imported with from
     """
+    def complex_name(self):
+        imported = self.imported()
+        return imported.complex_name()
+
     def imported(self):
         """Returns the imported language element.
         """
@@ -159,7 +164,10 @@ class LeFrom(LanguageElement):
             astng_element = self.astng_element.do_import_module(import_path)
         except InferenceError:
             imported_module = self.astng_element.do_import_module(module_name)
-            astng_element = imported_module[name]
+            try:
+                astng_element = imported_module[name]
+            except KeyError:
+                astng_element = imported_module[self.name()]
         return LanguageElement.create(astng_element, name=name,
                                       context_string=self.context_string)
     def bounded_accessibles(self):
@@ -172,6 +180,10 @@ class LeClass(LanguageElement):
     def __init__(self, *args, **kwargs):
         super(LeClass, self).__init__(*args, **kwargs)
         self._bases = None
+
+    def complex_name(self):
+        # TODO add constructor arguments here:
+        return self.name() + '('
 
     def free_accessibles(self):
         return self.parent().free_accessibles()
@@ -208,6 +220,13 @@ class LeClass(LanguageElement):
         """Returns the bounded accessible of a instance of this class.
         """
         return self.instance_attributes() + self.bounded_accessibles()
+
+
+class LeFunction(LanguageElement):
+    """This language element represent a python function or method.
+    """
+    def complex_name(self):
+        return '%s(%s)' % (self.name(), self.astng_element.args.as_string())
 
 
 class LeInstance(LanguageElement):

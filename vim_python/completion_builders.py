@@ -14,7 +14,7 @@ def vim_completion_builder(completionable):
             'word': word,
             'abbr': word,
             'kind': completionable.kind(),
-            'menu': str(completionable.linenumber()),
+            'menu': str(completionable.linenumber() or ''),
             'dup': '1',
         }
     except Exception, exc:

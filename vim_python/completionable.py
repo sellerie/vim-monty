@@ -8,6 +8,8 @@ class Completionable(object):
     Completionalbe is the support of the completion_entry, and startswith
     methods.  This class is extended by the LanguageElement classes.
     """
+    KIND = '?'
+
     def __init__(self, name):
         self._name = name
 
@@ -22,6 +24,14 @@ class Completionable(object):
         For example: function name with arguments.
         """
         return self.name()
+
+    def kind(self):
+        """Returns a char that represents the kind of the completionable.
+        
+        Overwrite this method with a special implementation for every
+        completionable.
+        """
+        return self.KIND
 
     def __cmp__(self, other):
         if self.startswith('__') and not other.startswith('__'):

@@ -124,6 +124,8 @@ class LeNoneType(LanguageElement):
 class LeModule(LanguageElement):
     """This language element represent a python module.
     """
+    KIND = 'm'
+
     def bounded_accessibles(self):
         return self.free_accessibles()
 
@@ -131,6 +133,8 @@ class LeModule(LanguageElement):
 class LeImport(LanguageElement):
     """This language element represent a python import command.
     """
+    KIND = 'm'
+
     def import_path(self):
         """Returns the import path.
         """
@@ -153,6 +157,10 @@ class LeFrom(LanguageElement):
     def complex_name(self):
         imported = self.imported()
         return imported.complex_name()
+
+    def kind(self):
+        imported = self.imported()
+        return imported.kind()
 
     def imported(self):
         """Returns the imported language element.
@@ -177,6 +185,8 @@ class LeFrom(LanguageElement):
 class LeClass(LanguageElement):
     """Language element of class elements.
     """
+    KIND = 'c'
+
     def __init__(self, *args, **kwargs):
         super(LeClass, self).__init__(*args, **kwargs)
         self._bases = None
@@ -225,6 +235,8 @@ class LeClass(LanguageElement):
 class LeFunction(LanguageElement):
     """This language element represent a python function or method.
     """
+    KIND = 'f'
+
     def complex_name(self):
         return '%s(%s)' % (self.name(), self.astng_element.args.as_string())
 
@@ -232,6 +244,7 @@ class LeFunction(LanguageElement):
 class LeInstance(LanguageElement):
     """This language element represent a class instantiation.
     """
+    KIND = 'i'
 
     def get_class(self):
         """Returns the language element of the class for this instance.
@@ -274,6 +287,8 @@ class LeConst(LanguageElement):
 class LeName(LanguageElement):
     """This is simply a python variable.
     """
+    KIND = 'v'
+
     def infer(self):
         """Find a more specific representation of the variable content.
         """
@@ -297,3 +312,8 @@ class LeAssName(LeName):
     """This is like 'LeName' but represent a variable assignment.
     """
 
+
+class LeAssAttr(LeName):
+    """A argument of a function.
+    """
+    KIND = 'a'

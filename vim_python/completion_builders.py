@@ -9,13 +9,12 @@ def vim_completion_builder(completionable):
     """Completion builder for a entry of the VIM omni completion.
     """
     try:
-        menu = '' # completionable.filename() + ':' + completionable.linenumber()
         word = completionable.complex_name()
         return {
             'word': word,
             'abbr': word,
             'kind': completionable.kind(),
-            'menu': menu,
+            'menu': str(completionable.linenumber()),
             'dup': '1',
         }
     except Exception, exc:

@@ -33,6 +33,11 @@ class Completionable(object):
         """
         return self.KIND
 
+    def linenumber(self):
+        """The completionable is defined on the resulting linenumber
+        """
+        return ''
+
     def __cmp__(self, other):
         if self.startswith('__') and not other.startswith('__'):
             return 1

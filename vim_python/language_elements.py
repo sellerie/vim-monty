@@ -110,6 +110,9 @@ class LanguageElement(completionable.Completionable):
             return self._name
         return self.astng_element.name
 
+    def linenumber(self):
+        return self.astng_element.fromlineno
+
 
 class LeNoneType(LanguageElement):
     """Language element if the element can not be found.

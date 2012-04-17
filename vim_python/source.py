@@ -69,7 +69,8 @@ class Source(object):
         accessibles.update(module.accessibles())
         return list(accessibles)
 
-    def completion(self, line, linenumber, column, base):
+    def completion(self, line, linenumber, column, base,
+                   completion_builder=None):
         try:
             tokens = line.strip().split()
             if tokens and (tokens[0] == 'import' or
@@ -82,7 +83,8 @@ class Source(object):
                 context = self.context(line, linenumber, column)
                 accessibles = context.accessibles()
             accessibles.sort()
-            return [accessible.completion_entry() for accessible in accessibles
+            return [accessible.completion_entry(completion_builder)
+                    for accessible in accessibles
                     if accessible.startswith(base)]
         except Exception, exc:
             log(exc)

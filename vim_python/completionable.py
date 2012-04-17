@@ -16,6 +16,13 @@ class Completionable(object):
         """
         return self._name
 
+    def complex_name(self):
+        """Overwrite this to return a complexer name of the given element.
+
+        For example: function name with arguments.
+        """
+        return self.name()
+
     def __cmp__(self, other):
         if self.startswith('__') and not other.startswith('__'):
             return 1
@@ -33,9 +40,11 @@ class Completionable(object):
     def __hash__(self):
         return hash(self.name())
 
-    def completion_entry(self):
+    def completion_entry(self, completion_builder=None):
         """Returns the entry for the completion list.
         """
+        if completion_builder:
+            return completion_builder(self)
         return self.name()
 
     def startswith(self, init_string):

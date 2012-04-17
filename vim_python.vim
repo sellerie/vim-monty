@@ -31,7 +31,8 @@ row, _column = vim.current.window.cursor
 line = vim.eval('g:vim_python_line')
 source = '\n'.join(vim.current.buffer[:])
 base = vim.eval("a:base")
-completions = vim_python.Source(source).completion(line, row, column, base)
+completions = vim_python.Source(source).completion(line, row, column, base,
+                                             vim_python.vim_completion_builder)
 vim.command('return %s' % completions)
 eopython
     endif

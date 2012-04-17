@@ -2,6 +2,7 @@
 """
 import source
 import logger
+import completion_builders
 
 
 def reload_submodules():
@@ -14,11 +15,14 @@ def reload_submodules():
                 value.reload_submodules()
             reload(value)
     global Source
+    global vim_completion_builder
     Source = source.Source
+    vim_completion_builder = vim_completion_builder
 
 
 Source = source.Source
 __builtins__['log'] = logger.log
+vim_completion_builder = completion_builders.vim_completion_builder
 
 
 def find_base_column(line, column):

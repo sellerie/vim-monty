@@ -157,8 +157,11 @@ class LeFrom(LanguageElement):
     """This language element represent a element imported with from
     """
     def complex_name(self):
-        imported = self.imported()
-        return imported.complex_name()
+        try:
+            imported = self.imported()
+            return imported.complex_name()
+        except InferenceError:
+            return self.name()
 
     def kind(self):
         imported = self.imported()

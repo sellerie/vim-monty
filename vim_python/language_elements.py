@@ -158,19 +158,20 @@ class LeFrom(LanguageElement):
     """
     def complex_name(self):
         try:
-            imported = self.imported()
+            imported = self.imported(self.name())
             return imported.complex_name()
         except InferenceError:
             return self.name()
 
     def kind(self):
-        imported = self.imported()
+        imported = self.imported(self.name())
         return imported.kind()
 
-    def imported(self):
+    def imported(self, name=None):
         """Returns the imported language element.
         """
-        name = self.context_string.split('.')[-1]
+        if not name:
+            name = self.context_string.split('.')[-1]
         module_name = self.astng_element.modname
         try:
             import_path = module_name + '.' + name
@@ -276,6 +277,7 @@ class LeConst(LanguageElement):
     from logilab.astng.builder import ASTNGBuilder
     from logilab.common.compat import builtins
     BUILTINS = ASTNGBuilder().inspect_build(builtins)
+    KIND = 'b'
 
     def bounded_accessibles(self):
         name = self.astng_element.pytype()

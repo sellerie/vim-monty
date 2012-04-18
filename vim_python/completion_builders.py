@@ -9,10 +9,9 @@ def vim_completion_builder(completionable):
     """Completion builder for a entry of the VIM omni completion.
     """
     try:
-        word = completionable.complex_name()
         return {
-            'word': word,
-            'abbr': word,
+            'word': completionable.complex_name(),
+            'abbr': completionable.name(),
             'kind': completionable.kind(),
             'menu': str(completionable.linenumber() or ''),
             'dup': '1',

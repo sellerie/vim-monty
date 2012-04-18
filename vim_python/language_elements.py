@@ -97,11 +97,6 @@ class LanguageElement(completionable.Completionable):
                                             context_string=self.context_string))
         return accessibles + self.parent().free_accessibles()
 
-    def implementaion(self):
-        """Returns the filename (path) and the line number of this element.
-        """
-        pass
-
     def name(self):
         """Returns the name of this element.
         """

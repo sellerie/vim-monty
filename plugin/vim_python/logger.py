@@ -2,8 +2,8 @@ import os
 
 
 HERE = os.path.dirname(__file__)
-LOGFILE = os.path.join(HERE, '..', 'vim_python.log')
-ENABLED = True
+LOGFILE = os.path.join(HERE, '..', '..', 'vim_python.log')
+ENABLED = False
 
 
 def log(msg):
@@ -13,4 +13,3 @@ def log(msg):
             msg = repr(msg)
         logfile.write(msg + '\n')
         logfile.close()
-

@@ -4,9 +4,14 @@ if !has('python')
     finish
 endif
 
+let s:here=expand("<sfile>:h")
 
 python << eopython
+import sys
+
 import vim
+
+sys.path.append(vim.eval('s:here'))
 import vim_python
 reload(vim_python)
 vim_python.reload_submodules()
@@ -37,4 +42,3 @@ vim.command('return %s' % completions)
 eopython
     endif
 endfunction
-

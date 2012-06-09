@@ -24,13 +24,14 @@ autocmd FileType python call PythonCompleteInit()
 function! PythonCompleteInit()
   setlocal omnifunc=vim_python#Complete
 
-  if not exists('g:vim_python_debug')
+  if !exists('g:vim_python_debug')
     let g:vim_python_debug = 0
   endif
 
 python << eopython
 from vim_python import logger
-logger.ENABLED = bool(vim.eval('g:vim_python_debug'))
+logger.ENABLED = bool(int(vim.eval('g:vim_python_debug')))
+
 eopython
 endfunction
 

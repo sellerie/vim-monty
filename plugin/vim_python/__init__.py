@@ -1,7 +1,6 @@
 """Use the Source class of this module to work.
 """
 import source
-import logger
 import completion_builders
 
 
@@ -21,7 +20,6 @@ def reload_submodules():
 
 
 Source = source.Source
-__builtins__['log'] = logger.log
 vim_completion_builder = completion_builders.vim_completion_builder
 
 

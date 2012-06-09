@@ -17,7 +17,14 @@ reload(vim_python)
 vim_python.reload_submodules()
 eopython
 
-autocmd BufRead *.py set omnifunc=vim_python#Complete
+
+autocmd FileType python call PythonCompleteInit()
+
+
+function! PythonCompleteInit()
+  setlocal omnifunc=vim_python#Complete
+endfunction
+
 
 function! vim_python#Complete(findstart, base)
     " see :help complete-functions

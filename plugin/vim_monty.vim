@@ -12,9 +12,9 @@ import sys
 import vim
 
 sys.path.append(vim.eval('s:here'))
-import vim_python
-reload(vim_python)
-vim_python.reload_submodules()
+import vim_monty
+reload(vim_monty)
+vim_monty.reload_submodules()
 eopython
 
 
@@ -22,40 +22,40 @@ autocmd FileType python call PythonCompleteInit()
 
 
 function! PythonCompleteInit()
-  setlocal omnifunc=vim_python#Complete
+  setlocal omnifunc=vim_monty#Complete
 
-  if !exists('g:vim_python_debug')
-    let g:vim_python_debug = 0
+  if !exists('g:vim_monty_debug')
+    let g:vim_monty_debug = 0
   endif
 
 python << eopython
-from vim_python import logger
-logger.ENABLED = bool(int(vim.eval('g:vim_python_debug')))
+from vim_monty import logger
+logger.ENABLED = bool(int(vim.eval('g:vim_monty_debug')))
 
 eopython
 endfunction
 
 
-function! vim_python#Complete(findstart, base)
+function! vim_monty#Complete(findstart, base)
     " see :help complete-functions
     if a:findstart == 1
 python << eopython
 row, column = vim.current.window.cursor
 line = vim.current.buffer[row-1]
-index = vim_python.find_base_column(line, column)
-vim.command('let g:vim_python_column = %d' % index)
-vim.command('let g:vim_python_line = %r' % line)
+index = vim_monty.find_base_column(line, column)
+vim.command('let g:vim_monty_column = %d' % index)
+vim.command('let g:vim_monty_line = %r' % line)
 vim.command('return %d' % index)
 eopython
     else
 python << eopython
-column = int(vim.eval('g:vim_python_column'))
+column = int(vim.eval('g:vim_monty_column'))
 row, _column = vim.current.window.cursor
-line = vim.eval('g:vim_python_line')
+line = vim.eval('g:vim_monty_line')
 source = '\n'.join(vim.current.buffer[:])
 base = vim.eval("a:base")
-completions = vim_python.Source(source).completion(line, row, column, base,
-                                             vim_python.vim_completion_builder)
+completions = vim_monty.Source(source).completion(line, row, column, base,
+                                             vim_monty.vim_completion_builder)
 vim.command('return %s' % completions)
 eopython
     endif

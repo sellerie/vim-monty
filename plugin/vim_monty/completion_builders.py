@@ -2,7 +2,7 @@
 
 At this point only a builder for VIM exists.
 """
-from vim_python.logger import log
+from vim_monty.logger import log
 
 
 def vim_completion_builder(completionable):

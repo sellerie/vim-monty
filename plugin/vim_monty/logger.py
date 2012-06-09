@@ -2,7 +2,7 @@ import os
 
 
 HERE = os.path.dirname(__file__)
-LOGFILE = os.path.join(HERE, '..', '..', 'vim_python.log')
+LOGFILE = os.path.join(HERE, '..', '..', 'vim_monty.log')
 ENABLED = False
 
 

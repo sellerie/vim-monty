@@ -4,8 +4,8 @@ The classes contain some analytic methods used on completion.
 """
 from logilab.astng.exceptions import InferenceError
 
-from vim_python import completionable
-from vim_python.logger import log
+from vim_monty import completionable
+from vim_monty.logger import log
 
 
 def reload_submodules():

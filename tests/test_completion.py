@@ -4,7 +4,7 @@
 import os
 import sys
 
-from vim_python import Source
+from vim_monty import Source
 
 
 HERE = os.path.dirname(__file__)
@@ -100,17 +100,17 @@ PACKAGE_MODULES = [
 
 
 def test_import_line():
-    line = "import vim_python."
+    line = "import vim_monty."
     compls = Source("\n\n").completion(line, 1, len(line), '')
     assert PACKAGE_MODULES == compls
 
-    line = "from vim_python."
+    line = "from vim_monty."
     compls = Source("\n\n").completion(line, 1, len(line), '')
     assert PACKAGE_MODULES == compls
 
 
 def test_from_line():
-    line = "from vim_python import "
+    line = "from vim_monty import "
     compls = Source("\n\n").completion(line, 1, len(line), '')
     expect = sorted(PACKAGE_MODULES + [
                     'Source',

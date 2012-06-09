@@ -6,7 +6,7 @@ from logilab.astng.builder import ASTNGBuilder
 
 import language_elements
 import completionable
-from vim_python.logger import log
+from vim_monty.logger import log
 
 
 def reload_submodules():

@@ -6,11 +6,16 @@ endif
 
 let s:here=expand("<sfile>:h")
 
+let s:pythonpath=system('python -c "import sys,os;print(os.linesep.join(sys.path))"')
+
 python << eopython
 import sys
+import os
 
 import vim
 
+# improve this by running the completion functionality through an extra program
+sys.path.extend(vim.eval('s:pythonpath').split(os.linesep))
 sys.path.append(vim.eval('s:here'))
 import vim_monty
 reload(vim_monty)

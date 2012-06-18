@@ -143,13 +143,17 @@ class PyModule(object):
             if linenumber is not None:
                 source_lines = source.split('\n')
                 original_line = source_lines[linenumber]
-                safe_line = indention_by_line(original_line) + 'pass'
+                indention = indention_by_line(original_line)
+                if original_line.strip().startswith('except'):
+                    safe_line = indention + 'except: pass'
+                else:
+                    safe_line = indention + 'pass'
                 log(safe_line)
                 source_lines[linenumber] = safe_line
             module = cls.BUILDER.string_build('\n'.join(source_lines))
         except Exception, exc:
             if linenumber is not None:
-                raise NotImplementedError("TODO")
+                raise NotImplementedError("TODO: %s" % exc)
             else:
                 raise exc
         return cls(module)

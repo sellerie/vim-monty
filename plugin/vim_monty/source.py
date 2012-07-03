@@ -77,8 +77,10 @@ class Source(object):
                            (tokens[0] == 'from' and len(tokens) < 3)):
                 accessibles = self.import_path_completion(line, linenumber,
                                                           column)
+                completion_builder = None
             elif tokens and tokens[0] == 'from' and tokens[2] == 'import':
                 accessibles = self.import_completion(tokens[1])
+                completion_builder = None
             else:
                 context = self.context(line, linenumber, column)
                 accessibles = context.accessibles()

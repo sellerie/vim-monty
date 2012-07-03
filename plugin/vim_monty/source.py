@@ -73,7 +73,10 @@ class Source(object):
                    completion_builder=None):
         try:
             tokens = line.strip().split()
-            if tokens and (tokens[0] == 'import' or
+            # TODO: clean up this bad if else chain
+            if len(tokens) == 2  and tokens[0] == 'from' and line.endswith(' '):
+                return ['import']
+            elif tokens and (tokens[0] == 'import' or
                            (tokens[0] == 'from' and len(tokens) < 3)):
                 accessibles = self.import_path_completion(line, linenumber,
                                                           column)

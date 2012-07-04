@@ -31,38 +31,38 @@ class Source(object):
         """
         return PyModule.by_source(self.source, *args, **kwargs)
 
-    def context_string(self, line, _linenumber, column):
+    def context_string(self, file_context):
         """Return the context string marked by the line and column number.
 
         A context string is a path like 'os.path.dirname'.
         """
-        column = min(column, len(line))
+        column = min(file_context.column, len(file_context.line))
         start_index = column
         while start_index > 0:
             start_index -= 1
-            if line[start_index] in ' \t;([{:,=<>':
+            if file_context.line[start_index] in ' \t;([{:,=<>':
                 start_index += 1
                 break
-        string_of_interest = line[start_index:column]
+        string_of_interest = file_context.line[start_index:file_context.column]
         if string_of_interest and string_of_interest[-1] == '.':
             return string_of_interest[:-1]
         return string_of_interest
 
-    def context(self, line, linenumber, column):
+    def context(self, file_context):
         """Calc the context element marked by the given line and column number.
         """
-        context_string = self.context_string(line, linenumber, column)
-        module = self.analyze(linenumber - 1)
-        scope = module.scope(linenumber)
+        context_string = self.context_string(file_context)
+        module = self.analyze(file_context.linenumber - 1)
+        scope = module.scope(file_context.linenumber)
         return scope.lookup(context_string)
 
-    def import_path_completion(self, line, linenumber, column):
+    def import_path_completion(self, file_context):
         """Get completion of import paths.
 
         This method returns the accessible modules and packages in lines like:
         ``import os.`` or ``from os.``.
         """
-        import_path = self.context_string(line, linenumber, column)
+        import_path = self.context_string(file_context)
         module = PyModule.by_module_path(import_path)
         accessibles = module.package_modules()
         accessibles.update(module.accessible_modules())
@@ -91,14 +91,13 @@ class Source(object):
             if file_context.need_import_statement():
                 return ['import ']
             elif file_context.is_import_path():
-                accessibles = self.import_path_completion(line, linenumber,
-                                                          column)
+                accessibles = self.import_path_completion(file_context)
                 completion_builder = None
             elif file_context.is_from_import():
                 accessibles = self.import_completion(file_context.tokens()[1])
                 completion_builder = None
             else:
-                ast_context = self.context(line, linenumber, column)
+                ast_context = self.context(file_context)
                 accessibles = ast_context.accessibles()
             accessibles.sort()
             return [accessible.completion_entry(completion_builder)

@@ -4,8 +4,8 @@ import os
 
 from logilab.astng.builder import ASTNGBuilder
 
-import language_elements
-import completionable
+from vim_monty import language_elements
+from vim_monty import completionable
 from vim_monty.logger import log
 
 

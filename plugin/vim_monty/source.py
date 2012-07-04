@@ -86,7 +86,6 @@ class Source(object):
         is given by *line*, *linenumber* and *column*.
         """
         try:
-            tokens = line.strip().split()
             context = Context(line, linenumber, column)
             # TODO: clean up this bad if else chain
             if context.need_import_statement():
@@ -96,7 +95,7 @@ class Source(object):
                                                           column)
                 completion_builder = None
             elif context.is_from_import():
-                accessibles = self.import_completion(tokens[1])
+                accessibles = self.import_completion(context.tokens()[1])
                 completion_builder = None
             else:
                 ast_context = self.context(line, linenumber, column)

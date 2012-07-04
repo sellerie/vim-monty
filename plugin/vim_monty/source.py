@@ -114,14 +114,14 @@ class Source(object):
 class Context(object):
     """Represents the current context in the python file.
 
-    The context is given by *line*, *line_number* and *column*.
+    The context is given by *line*, *linenumber* and *column*.
     """
     # TODO: Maybe add source here:
     # TODO: Rename some functionality, because the name context is already in
     #       use
-    def __init__(self, line, line_number, column):
+    def __init__(self, line, linenumber, column):
         self.line = line
-        self.line_number = line_number
+        self.linenumber = linenumber
         self.column = column
 
     def tokens(self, complete=False):

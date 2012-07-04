@@ -31,7 +31,7 @@ class Source(object):
         """
         return PyModule.by_source(self.source, *args, **kwargs)
 
-    def context_string(self, line, linenumber, column):
+    def context_string(self, line, _linenumber, column):
         """Return the context string marked by the given line and column number.
 
         A context string is a path like 'os.path.dirname'.
@@ -57,6 +57,11 @@ class Source(object):
         return scope.lookup(context_string)
 
     def import_path_completion(self, line, linenumber, column):
+        """Get completion of import paths.
+
+        This method returns the accessible modules and packages in lines like:
+        ``import os.`` or ``from os.``.
+        """
         import_path = self.context_string(line, linenumber, column)
         module = PyModule.by_module_path(import_path)
         accessibles = module.package_modules()
@@ -64,6 +69,10 @@ class Source(object):
         return list(accessibles)
     
     def import_completion(self, import_path):
+        """Returns completion of from import lines.
+
+        Complete the part after ``import`` in lines like ``from os import``.
+        """
         module = PyModule.by_module_path(import_path)
         accessibles = module.package_modules()
         accessibles.update(module.accessibles())
@@ -71,6 +80,11 @@ class Source(object):
 
     def completion(self, line, linenumber, column, base,
                    completion_builder=None):
+        """This is the entry point of the completion functionality.
+
+        Returns all in the given context accessible constructs.  The context
+        is given by *line*, *linenumber* and *column*.
+        """
         try:
             tokens = line.strip().split()
             # TODO: clean up this bad if else chain
@@ -99,6 +113,8 @@ class Source(object):
 
 
 def indention_by_line(line):
+    """Returns the indention of the given line.
+    """
     indention = ''
     for char in line:
         if char == ' ' or char == '\n':

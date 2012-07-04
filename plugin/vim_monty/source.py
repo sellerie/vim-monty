@@ -32,7 +32,7 @@ class Source(object):
         return PyModule.by_source(self.source, *args, **kwargs)
 
     def context_string(self, line, _linenumber, column):
-        """Return the context string marked by the given line and column number.
+        """Return the context string marked by the line and column number.
 
         A context string is a path like 'os.path.dirname'.
         """
@@ -67,7 +67,7 @@ class Source(object):
         accessibles = module.package_modules()
         accessibles.update(module.accessible_modules())
         return list(accessibles)
-    
+
     def import_completion(self, import_path):
         """Returns completion of from import lines.
 
@@ -181,7 +181,7 @@ class PyModule(object):
 
     @classmethod
     def by_module_path(cls, module_path):
-        helper_module = cls.BUILDER.string_build('') # TODO: bad
+        helper_module = cls.BUILDER.string_build('')  # TODO: bad
         module = helper_module.import_module(module_path)
         return cls(module)
 
@@ -206,4 +206,3 @@ class PyModule(object):
     def accessibles(self):
         module = language_elements.LanguageElement.create(self.astng_module)
         return module.accessibles()
-

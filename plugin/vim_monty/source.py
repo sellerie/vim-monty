@@ -87,20 +87,20 @@ class Source(object):
         """
         try:
             tokens = line.strip().split()
+            context = Context(line, linenumber, column)
             # TODO: clean up this bad if else chain
-            if len(tokens) == 2  and tokens[0] == 'from' and line.endswith(' '):
-                return ['import']
-            elif tokens and (tokens[0] == 'import' or
-                           (tokens[0] == 'from' and len(tokens) < 3)):
+            if context.need_import_statement():
+                return ['import ']
+            elif context.is_import_path():
                 accessibles = self.import_path_completion(line, linenumber,
                                                           column)
                 completion_builder = None
-            elif tokens and tokens[0] == 'from' and tokens[2] == 'import':
+            elif context.is_from_import():
                 accessibles = self.import_completion(tokens[1])
                 completion_builder = None
             else:
-                context = self.context(line, linenumber, column)
-                accessibles = context.accessibles()
+                ast_context = self.context(line, linenumber, column)
+                accessibles = ast_context.accessibles()
             accessibles.sort()
             return [accessible.completion_entry(completion_builder)
                     for accessible in accessibles
@@ -110,6 +110,41 @@ class Source(object):
             import traceback
             log(traceback.format_exc())
             return []
+
+
+class Context(object):
+    """Represents the current context in the python file.
+
+    The context is given by *line*, *line_number* and *column*.
+    """
+    # TODO: Maybe add source here:
+    # TODO: Rename some functionality, because the name context is already in
+    #       use
+    def __init__(self, line, line_number, column):
+        self.line = line
+        self.line_number = line_number
+        self.column = column
+
+    def tokens(self, complete=False):
+        if complete:
+            return self.line.strip().split()
+        return self.line[:self.column].strip().split()
+
+    def is_import_path(self):
+        tokens = self.tokens()
+        return (tokens and
+                (tokens[0] == 'import' or
+                 (tokens[0] == 'from' and len(tokens) < 3)))
+
+    def is_from_import(self):
+        tokens = self.tokens()
+        return tokens and tokens[0] == 'from' and tokens[2] == 'import'
+
+    def need_import_statement(self):
+        tokens = self.tokens()
+        return (len(tokens) == 2 and
+                tokens[0] == 'from' and
+                self.line.endswith(' '))
 
 
 def indention_by_line(line):

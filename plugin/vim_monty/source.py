@@ -190,25 +190,22 @@ class PyModule(object):
         return language_elements.LanguageElement.create(scope)
 
     @classmethod
-    def by_source(cls, source, linenumber=None, fill='pass'):
-        try:
-            if linenumber is not None:
-                source_lines = source.split('\n')
-                original_line = source_lines[linenumber]
-                indention = indention_by_line(original_line)
-                if original_line.strip().startswith('except'):
-                    safe_line = indention + 'except: pass'
-                else:
-                    safe_line = indention + fill
-                log(safe_line)
-                source_lines[linenumber] = safe_line
-            module = cls.BUILDER.string_build('\n'.join(source_lines))
-        except Exception, exc:
-            if linenumber is not None and fill:
-                return cls.by_source(source, linenumber, '')
-            else:
-                raise exc
-        return cls(module)
+    def by_source(cls, source, linenumber=None):
+        if linenumber is not None:
+            source_lines = source.split('\n')
+            original_line = source_lines[linenumber]
+            indention = indention_by_line(original_line)
+            for fill in ['pass', 'except: pass', '']:
+                try:
+                    source_lines[linenumber] = indention + fill
+                    module = cls.BUILDER.string_build('\n'.join(source_lines))
+                    return cls(module)
+                except:
+                    pass
+            raise NotImplementedError("TODO: Can't parse file")
+        else:
+            raise RuntimeError("No line number given.")
+        return None
 
     @classmethod
     def by_module_path(cls, module_path):

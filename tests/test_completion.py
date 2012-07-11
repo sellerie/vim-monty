@@ -42,6 +42,10 @@ def test_module():
     line_in_dict = 24
     assert AModule.GLOBALS == AModule.completion('', line_in_dict)
     assert AModule.GLOBALS == AModule.completion('"hehe": ', line_in_dict)
+    
+    line_end_dict = 25
+    assert AModule.GLOBALS == AModule.completion('', line_end_dict)
+    assert AModule.GLOBALS == AModule.completion('', line_end_dict, 3)
 
 
 def test_imported():

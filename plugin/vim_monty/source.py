@@ -195,7 +195,7 @@ class PyModule(object):
             source_lines = source.split('\n')
             original_line = source_lines[linenumber]
             indention = indention_by_line(original_line)
-            for fill in ['pass', 'except: pass', '']:
+            for fill in ('pass', 'except: pass', '', original_line):
                 try:
                     source_lines[linenumber] = indention + fill
                     module = cls.BUILDER.string_build('\n'.join(source_lines))

@@ -19,3 +19,8 @@ A_INSTANCE = AClass()
 
 A_CLASS = AClass
 
+A_DICTIONARY = {
+        'key': 'value',
+
+}
+

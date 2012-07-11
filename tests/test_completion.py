@@ -23,8 +23,8 @@ class AModule(object):
     SOURCE_STR = open(os.path.join(FIXTURES, 'a_module.py')).read()
     SOURCE = Source(SOURCE_STR)
     LAST_LINE = len(SOURCE_STR.split('\n')) - 1
-    GLOBALS = ['AClass', 'A_CLASS', 'A_INSTANCE', 'A_INTEGER', 'A_STRING',
-               'BClass']
+    GLOBALS = ['AClass', 'A_CLASS', 'A_DICTIONARY', 'A_INSTANCE',
+               'A_INTEGER', 'A_STRING', 'BClass']
     A_CLASS_ELEMENTS = ['CLASS_VAR', 'a_method', 'b_class_method', '__init__']
 
     @staticmethod
@@ -38,6 +38,10 @@ class AModule(object):
 
 def test_module():
     assert AModule.GLOBALS == AModule.completion('')
+
+    line_in_dict = 24
+    assert AModule.GLOBALS == AModule.completion('', line_in_dict)
+    assert AModule.GLOBALS == AModule.completion('"hehe": ', line_in_dict)
 
 
 def test_imported():

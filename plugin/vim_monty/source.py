@@ -190,7 +190,7 @@ class PyModule(object):
         return language_elements.LanguageElement.create(scope)
 
     @classmethod
-    def by_source(cls, source, linenumber=None):
+    def by_source(cls, source, linenumber=None, fill='pass'):
         try:
             if linenumber is not None:
                 source_lines = source.split('\n')
@@ -199,13 +199,13 @@ class PyModule(object):
                 if original_line.strip().startswith('except'):
                     safe_line = indention + 'except: pass'
                 else:
-                    safe_line = indention + 'pass'
+                    safe_line = indention + fill
                 log(safe_line)
                 source_lines[linenumber] = safe_line
             module = cls.BUILDER.string_build('\n'.join(source_lines))
         except Exception, exc:
-            if linenumber is not None:
-                raise NotImplementedError("TODO: %s" % exc)
+            if linenumber is not None and fill:
+                return cls.by_source(source, linenumber, '')
             else:
                 raise exc
         return cls(module)

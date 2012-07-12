@@ -4,7 +4,7 @@
 import os
 import sys
 
-from vim_monty import Source
+from vim_monty import completion
 
 
 HERE = os.path.dirname(__file__)
@@ -17,23 +17,22 @@ sys.path.append(FIXTURES)
 
 class AModule(object):
     """Contains informations about the test source code.
-    
+
     This is only to namespace this data.
     """
-    SOURCE_STR = open(os.path.join(FIXTURES, 'a_module.py')).read()
-    SOURCE = Source(SOURCE_STR)
-    LAST_LINE = len(SOURCE_STR.split('\n')) - 1
+    SOURCE = open(os.path.join(FIXTURES, 'a_module.py')).read()
+    LAST_LINE = len(SOURCE.split('\n')) - 1
     GLOBALS = ['AClass', 'A_CLASS', 'A_DICTIONARY', 'A_INSTANCE',
                'A_INTEGER', 'A_STRING', 'BClass']
     A_CLASS_ELEMENTS = ['CLASS_VAR', 'a_method', 'b_class_method', '__init__']
 
-    @staticmethod
-    def completion(line, linenumber=None, column=None, base=''):
+    @classmethod
+    def completion(cls, line, linenumber=None, column=None, base=''):
         if linenumber is None:
             linenumber = AModule.LAST_LINE
         if column is None:
             column = len(line)
-        return AModule.SOURCE.completion(line, linenumber, column, base)
+        return completion(cls.SOURCE, line, linenumber, column, base)
 
 
 def test_module():
@@ -42,7 +41,7 @@ def test_module():
     line_in_dict = 24
     assert AModule.GLOBALS == AModule.completion('', line_in_dict)
     assert AModule.GLOBALS == AModule.completion('"hehe": ', line_in_dict)
-    
+
     line_end_dict = 25
     assert AModule.GLOBALS == AModule.completion('', line_end_dict)
     assert AModule.GLOBALS == AModule.completion('', line_end_dict, 3)
@@ -50,7 +49,7 @@ def test_module():
 
 def test_imported():
     python_code = "import a_module\na_module.\n"
-    compls = Source(python_code).completion('a_module.', 2, 8, '')
+    compls = completion(python_code, 'a_module.', 2, 8, '')
     assert AModule.GLOBALS == compls
 
 
@@ -89,7 +88,7 @@ def test_from():
 
     # Test of a deeper from import, BClass is also imported by 'a_module'.
     python_code = 'from a_module import BClass\n\n'
-    compls = Source(python_code).completion(line, 2, len(line), '')
+    compls = completion(python_code, line, 2, len(line), '')
     assert 'b_class_method' in compls
 
 
@@ -109,22 +108,21 @@ PACKAGE_MODULES = [
 
 def test_import_line():
     line = "import vim_monty."
-    compls = Source("\n\n").completion(line, 1, len(line), '')
+    compls = completion('\n\n', line, 1, len(line), '')
     assert PACKAGE_MODULES == compls
 
     line = "from vim_monty."
-    compls = Source("\n\n").completion(line, 1, len(line), '')
+    compls = completion('\n\n', line, 1, len(line), '')
     assert PACKAGE_MODULES == compls
 
 
 def test_from_line():
     line = "from vim_monty import "
-    compls = Source("\n\n").completion(line, 1, len(line), '')
+    compls = completion('\n\n', line, 1, len(line), '')
     expect = sorted(PACKAGE_MODULES + [
-                    'Source',
+                    'completion',
                     'find_base_column',
                     'reload_submodules',
                     'vim_completion_builder',
     ])
     assert expect == compls
-

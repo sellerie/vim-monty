@@ -15,11 +15,9 @@ def reload_submodules():
             reload(value)
     global Source
     global vim_completion_builder
-    Source = source.Source
     vim_completion_builder = vim_completion_builder
 
 
-Source = source.Source
 vim_completion_builder = completion_builders.vim_completion_builder
 
 
@@ -35,3 +33,9 @@ def find_base_column(line, column):
             break
     return index # this is zero based :S
  
+
+def completion(src, line, lineno, column, base, completion_builder=None):
+    """This is the entry point for the completion.
+    """
+    file_state = source.FileState(line, src, lineno, column)
+    return source.completion(file_state, base, completion_builder)

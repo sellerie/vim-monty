@@ -20,42 +20,21 @@ def reload_submodules():
             reload(value)
 
 
-class Source(object):
-    """Provides functionality to analyze a python source code
+def completion(file_state, base='', completion_builder=None):
+    """Returns the completion.
+
+    Use this function as entry point to this module.  See __init__.completion.
     """
-    def __init__(self, source):
-        self.source = source
-
-    def completion(self, line, linenumber, column, base,
-                   completion_builder=None):
-        """This is the entry point of the completion functionality.
-
-        Returns all in the given context accessible constructs.  The context
-        is given by *line*, *linenumber* and *column*.
-        """
-        try:
-            file_context = FileState(line, self.source, linenumber, column)
-            # TODO: clean up this bad if else chain
-            if file_context.need_import_statement():
-                return ['import ']
-            elif file_context.is_import_path():
-                accessibles = file_context.import_path_completion()
-                completion_builder = None
-            elif file_context.is_from_import():
-                accessibles = file_context.import_completion()
-                completion_builder = None
-            else:
-                ast_context = file_context.context()
-                accessibles = ast_context.accessibles()
-            accessibles.sort()
-            return [accessible.completion_entry(completion_builder)
-                    for accessible in accessibles
-                    if accessible.startswith(base)]
-        except Exception, exc:
-            log(exc)
-            import traceback
-            log(traceback.format_exc())
-            return []
+    accessibles = file_state.accessibles()
+    accessibles.sort()
+    try:
+        return [accessible.completion_entry(completion_builder)
+                for accessible in accessibles if accessible.startswith(base)]
+    except Exception, exc:
+        log(exc)
+        import traceback
+        log(traceback.format_exc())
+        return []
 
 
 class FileState(object):
@@ -68,6 +47,17 @@ class FileState(object):
         self.source = source
         self.linenumber = linenumber
         self.column = column
+
+    def accessibles(self):
+        """Returns all accessibles of this file state.
+        """
+        if self.need_import_statement():
+            return [completionable.Completionable('import ')]
+        elif self.is_import_path():
+            return self.import_path_completion()
+        elif self.is_from_import():
+            return self.import_completion()
+        return self.context().accessibles()
 
     def analyze(self, *args, **kwargs):
         """Analyze the source code of this instance.

@@ -1,7 +1,7 @@
 """Use the Source class of this module to work.
 """
-import source
-import completion_builders
+from vim_monty import source
+from vim_monty import completion_builders
 
 
 def reload_submodules():
@@ -13,7 +13,6 @@ def reload_submodules():
             if hasattr(value, 'reload_submodules'):
                 value.reload_submodules()
             reload(value)
-    global Source
     global vim_completion_builder
     vim_completion_builder = vim_completion_builder
 

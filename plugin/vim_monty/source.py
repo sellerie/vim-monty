@@ -56,7 +56,7 @@ class Source(object):
         is given by *line*, *linenumber* and *column*.
         """
         try:
-            file_context = FileContext(line, self.source, linenumber, column)
+            file_context = FileState(line, self.source, linenumber, column)
             # TODO: clean up this bad if else chain
             if file_context.need_import_statement():
                 return ['import ']
@@ -80,10 +80,10 @@ class Source(object):
             return []
 
 
-class FileContext(object):
-    """Represents the current context in the python file.
+class FileState(object):
+    """Represents the current state in the python file.
 
-    The context is given by *line*, *linenumber* and *column*.
+    The context is given by *line*, *source*, *linenumber* and *column*.
     """
     def __init__(self, line, source, linenumber, column):
         self.line = line

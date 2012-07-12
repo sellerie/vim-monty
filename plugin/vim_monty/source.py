@@ -26,28 +26,6 @@ class Source(object):
     def __init__(self, source):
         self.source = source
 
-    def import_path_completion(self, file_context):
-        """Get completion of import paths.
-
-        This method returns the accessible modules and packages in lines like:
-        ``import os.`` or ``from os.``.
-        """
-        import_path = file_context.context_string()
-        module = PyModule.by_module_path(import_path)
-        accessibles = module.package_modules()
-        accessibles.update(module.accessible_modules())
-        return list(accessibles)
-
-    def import_completion(self, import_path):
-        """Returns completion of from import lines.
-
-        Complete the part after ``import`` in lines like ``from os import``.
-        """
-        module = PyModule.by_module_path(import_path)
-        accessibles = module.package_modules()
-        accessibles.update(module.accessibles())
-        return list(accessibles)
-
     def completion(self, line, linenumber, column, base,
                    completion_builder=None):
         """This is the entry point of the completion functionality.
@@ -61,10 +39,10 @@ class Source(object):
             if file_context.need_import_statement():
                 return ['import ']
             elif file_context.is_import_path():
-                accessibles = self.import_path_completion(file_context)
+                accessibles = file_context.import_path_completion()
                 completion_builder = None
             elif file_context.is_from_import():
-                accessibles = self.import_completion(file_context.tokens()[1])
+                accessibles = file_context.import_completion()
                 completion_builder = None
             else:
                 ast_context = file_context.context()
@@ -120,6 +98,29 @@ class FileState(object):
         module = self.analyze(self.linenumber - 1)
         scope = module.scope(self.linenumber)
         return scope.lookup(context_string)
+
+    def import_path_completion(self):
+        """Get completion of import paths.
+
+        This method returns the accessible modules and packages in lines like:
+        ``import os.`` or ``from os.``.
+        """
+        import_path = self.context_string()
+        module = PyModule.by_module_path(import_path)
+        accessibles = module.package_modules()
+        accessibles.update(module.accessible_modules())
+        return list(accessibles)
+
+    def import_completion(self, import_path=None):
+        """Returns completion of from import lines.
+
+        Complete the part after ``import`` in lines like ``from os import``.
+        """
+        import_path = import_path or self.tokens()[1]
+        module = PyModule.by_module_path(import_path)
+        accessibles = module.package_modules()
+        accessibles.update(module.accessibles())
+        return list(accessibles)
 
     def tokens(self, complete=False):
         """Returns a list of tokens (strings) of the current line.

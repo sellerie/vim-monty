@@ -28,7 +28,7 @@ def completion(file_state, base='', completion_builder=None):
     accessibles = file_state.accessibles()
     accessibles.sort()
     try:
-        return [accessible.completion_entry(completion_builder)
+        return [accessible.completion_entry(completion_builder, file_state)
                 for accessible in accessibles if accessible.startswith(base)]
     except Exception, exc:
         log(exc)

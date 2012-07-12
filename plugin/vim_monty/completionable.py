@@ -55,11 +55,11 @@ class Completionable(object):
     def __hash__(self):
         return hash(self.name())
 
-    def completion_entry(self, completion_builder=None):
+    def completion_entry(self, completion_builder=None, file_state=None):
         """Returns the entry for the completion list.
         """
         if completion_builder:
-            return completion_builder(self)
+            return completion_builder(self, file_state)
         return self.name()
 
     def startswith(self, init_string):

@@ -122,21 +122,33 @@ class FileContext(object):
         self.column = column
 
     def tokens(self, complete=False):
+        """Returns a list of tokens (strings) of the current line.
+
+        If ``complete`` ist true, use only the line before the current column.
+        """
         if complete:
             return self.line.strip().split()
         return self.line[:self.column].strip().split()
 
     def is_import_path(self):
+        """Returns true, if the current context is a import path.
+
+        A import path ist the part after import or between from and import.
+        """
         tokens = self.tokens()
         return (tokens and
                 (tokens[0] == 'import' or
                  (tokens[0] == 'from' and len(tokens) < 3)))
 
     def is_from_import(self):
+        """True, if the context is the part after import of a from line.
+        """
         tokens = self.tokens()
         return tokens and tokens[0] == 'from' and tokens[2] == 'import'
 
     def need_import_statement(self):
+        """True, if we are in a from line and now we need the import keyword.
+        """
         tokens = self.tokens()
         return (len(tokens) == 2 and
                 tokens[0] == 'from' and

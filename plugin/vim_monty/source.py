@@ -26,43 +26,13 @@ class Source(object):
     def __init__(self, source):
         self.source = source
 
-    def analyze(self, *args, **kwargs):
-        """Analyze the source code of this instance.
-        """
-        return PyModule.by_source(self.source, *args, **kwargs)
-
-    def context_string(self, file_context):
-        """Return the context string marked by the line and column number.
-
-        A context string is a path like 'os.path.dirname'.
-        """
-        column = min(file_context.column, len(file_context.line))
-        start_index = column
-        while start_index > 0:
-            start_index -= 1
-            if file_context.line[start_index] in ' \t;([{:,=<>':
-                start_index += 1
-                break
-        string_of_interest = file_context.line[start_index:file_context.column]
-        if string_of_interest and string_of_interest[-1] == '.':
-            return string_of_interest[:-1]
-        return string_of_interest
-
-    def context(self, file_context):
-        """Calc the context element marked by the given line and column number.
-        """
-        context_string = self.context_string(file_context)
-        module = self.analyze(file_context.linenumber - 1)
-        scope = module.scope(file_context.linenumber)
-        return scope.lookup(context_string)
-
     def import_path_completion(self, file_context):
         """Get completion of import paths.
 
         This method returns the accessible modules and packages in lines like:
         ``import os.`` or ``from os.``.
         """
-        import_path = self.context_string(file_context)
+        import_path = file_context.context_string()
         module = PyModule.by_module_path(import_path)
         accessibles = module.package_modules()
         accessibles.update(module.accessible_modules())
@@ -86,7 +56,7 @@ class Source(object):
         is given by *line*, *linenumber* and *column*.
         """
         try:
-            file_context = FileContext(line, linenumber, column)
+            file_context = FileContext(line, self.source, linenumber, column)
             # TODO: clean up this bad if else chain
             if file_context.need_import_statement():
                 return ['import ']
@@ -97,7 +67,7 @@ class Source(object):
                 accessibles = self.import_completion(file_context.tokens()[1])
                 completion_builder = None
             else:
-                ast_context = self.context(file_context)
+                ast_context = file_context.context()
                 accessibles = ast_context.accessibles()
             accessibles.sort()
             return [accessible.completion_entry(completion_builder)
@@ -115,11 +85,41 @@ class FileContext(object):
 
     The context is given by *line*, *linenumber* and *column*.
     """
-    # TODO: Maybe add source here:
-    def __init__(self, line, linenumber, column):
+    def __init__(self, line, source, linenumber, column):
         self.line = line
+        self.source = source
         self.linenumber = linenumber
         self.column = column
+
+    def analyze(self, *args, **kwargs):
+        """Analyze the source code of this instance.
+        """
+        return PyModule.by_source(self.source, *args, **kwargs)
+
+    def context_string(self):
+        """Return the context string marked by the line and column number.
+
+        A context string is a path like 'os.path.dirname'.
+        """
+        column = min(self.column, len(self.line))
+        start_index = column
+        while start_index > 0:
+            start_index -= 1
+            if self.line[start_index] in ' \t;([{:,=<>':
+                start_index += 1
+                break
+        string_of_interest = self.line[start_index:self.column]
+        if string_of_interest and string_of_interest[-1] == '.':
+            return string_of_interest[:-1]
+        return string_of_interest
+
+    def context(self):
+        """Calc the context element marked by the given line and column number.
+        """
+        context_string = self.context_string()
+        module = self.analyze(self.linenumber - 1)
+        scope = module.scope(self.linenumber)
+        return scope.lookup(context_string)
 
     def tokens(self, complete=False):
         """Returns a list of tokens (strings) of the current line.

@@ -59,11 +59,6 @@ class FileState(object):
             return self.import_completion()
         return self.context().accessibles()
 
-    def analyze(self, *args, **kwargs):
-        """Analyze the source code of this instance.
-        """
-        return PyModule.by_source(self.source, *args, **kwargs)
-
     def context_string(self):
         """Return the context string marked by the line and column number.
 
@@ -85,7 +80,7 @@ class FileState(object):
         """Calc the context element marked by the given line and column number.
         """
         context_string = self.context_string()
-        module = self.analyze(self.linenumber - 1)
+        module = PyModule.by_source(self.source, self.linenumber - 1)
         scope = module.scope(self.linenumber)
         return scope.lookup(context_string)
 

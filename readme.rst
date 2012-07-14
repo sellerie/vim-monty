@@ -29,7 +29,7 @@ configuration::
 The completion is based on logilab-astng library, so you need to install this
 by::
 
-   pip install logilab-astng
+   $ pip install logilab-astng
 
 
 Usage
@@ -47,10 +47,10 @@ Tests
 Vim-monty's unittests are written with the py.test_ framework.  This can be
 installed with::
 
-   pip install pytest
+   $ pip install pytest
 
 After that you can run the unittests by::
 
-   PYTHONPATH=plugin py.test
+   $ PYTHONPATH=plugin py.test
 
 .. _py.test: http://pytest.org

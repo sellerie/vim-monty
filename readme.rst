@@ -30,3 +30,13 @@ The completion is based on logilab-astng library, so you need to install this
 by::
 
    pip install logilab-astng
+
+
+Usage
+=====
+
+At this point only *omnicompletion* is supported.  So you can do tasks like::
+
+   import os.<C-X><C-O>
+   from os import <C-X><C-O>
+   os.pa<C-X><C-O>

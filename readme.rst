@@ -5,7 +5,7 @@ Python development in Vim
 With this code I try to extend Vim_ with features related to python_
 development.  At first this project should contain two features:
 
- * a better omnicompletion functionality (in progress)
+ * a better *omnicompletion* functionality (in progress)
 
  * a go-to-implementation functionality (TODO)
 
@@ -18,4 +18,15 @@ development.  At first this project should contain two features:
 Install
 =======
 
-TODO
+If you use Vundle_, simply add this repository as Bundle to your vim
+configuration::
+
+   Bundle 'sellerie/vim-monty'
+
+.. _Vundle: https://github.com/gmarik/vundle
+
+
+The completion is based on logilab-astng library, so you need to install this
+by::
+
+   pip install logilab-astng

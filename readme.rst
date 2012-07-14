@@ -9,7 +9,7 @@ development.  At first this project should contain two features:
 
  * a go-to-implementation functionality (TODO)
 
-
+This project is in an early state and has many issues.
 
 .. _Vim: http://www.vim.org
 .. _python: http://www.python.org

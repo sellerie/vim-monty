@@ -40,3 +40,17 @@ At this point only *omnicompletion* is supported.  So you can do tasks like::
    import os.<C-X><C-O>
    from os import <C-X><C-O>
    os.pa<C-X><C-O>
+
+Tests
+=====
+
+Vim-monty's unittests are written with the py.test_ framework.  This can be
+installed with::
+
+   pip install pytest
+
+After that you can run the unittests by::
+
+   PYTHONPATH=plugin py.test
+
+.. _py.test: http://pytest.org

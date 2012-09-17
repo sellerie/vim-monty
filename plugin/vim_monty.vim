@@ -17,13 +17,16 @@ import vim
 # improve this by running the completion functionality through an extra program
 sys.path.extend(vim.eval('s:pythonpath').split(os.linesep))
 sys.path.append(vim.eval('s:here'))
-import vim_monty
-reload(vim_monty)
-vim_monty.reload_submodules()
+try:
+    import vim_monty
+    reload(vim_monty)
+    vim_monty.reload_submodules()
+    vim.command('autocmd FileType python call PythonCompleteInit()')
+except ImportError, exc:
+    print "Deactivate vim-monty: %s" % exc
 eopython
 
 
-autocmd FileType python call PythonCompleteInit()
 
 
 function! PythonCompleteInit()

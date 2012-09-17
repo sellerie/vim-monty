@@ -9,6 +9,7 @@ from vim_monty import completionable
 from vim_monty.logger import log
 
 
+
 def reload_submodules():
     """Reload every imported module to simplify development.
     """
@@ -193,7 +194,7 @@ class PyModule(object):
             source_lines = source.split('\n')
             original_line = source_lines[linenumber]
             indention = indention_by_line(original_line)
-            for fill in ('pass', 'except: pass', '', original_line):
+            for fill in ('pass', 'except: pass', 'except:', '', original_line):
                 try:
                     source_lines[linenumber] = indention + fill
                     module = cls.BUILDER.string_build('\n'.join(source_lines))

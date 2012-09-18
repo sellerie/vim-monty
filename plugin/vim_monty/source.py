@@ -26,9 +26,9 @@ def completion(file_state, base='', completion_builder=None):
 
     Use this function as entry point to this module.  See __init__.completion.
     """
-    accessibles = file_state.accessibles()
-    accessibles.sort()
     try:
+        accessibles = file_state.accessibles()
+        accessibles.sort()
         return [accessible.completion_entry(completion_builder, file_state)
                 for accessible in accessibles if accessible.startswith(base)]
     except Exception, exc:

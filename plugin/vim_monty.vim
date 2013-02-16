@@ -23,7 +23,14 @@ try:
     vim_monty.reload_submodules()
     vim.command('autocmd FileType python call PythonCompleteInit()')
 except ImportError, exc:
-    print "Deactivate vim-monty: %s" % exc
+    sys.path.append(vim.eval('g:vim_monty_fallback_python_path'))
+    try:
+        import vim_monty
+        reload(vim_monty)
+        vim_monty.reload_submodules()
+        vim.command('autocmd FileType python call PythonCompleteInit()')
+    except ImportError:
+        print "Deactivate vim-monty: %s" % exc
 eopython
 
 

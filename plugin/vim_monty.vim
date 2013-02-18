@@ -13,7 +13,13 @@ import sys
 import os
 
 import vim
+eopython
 
+autocmd FileType python call PythonCompleteInit()
+
+
+function! PythonCompleteInit()
+python << eopython
 # improve this by running the completion functionality through an extra program
 sys.path.extend(vim.eval('s:pythonpath').split(os.linesep))
 sys.path.append(vim.eval('s:here'))
@@ -21,22 +27,18 @@ try:
     import vim_monty
     reload(vim_monty)
     vim_monty.reload_submodules()
-    vim.command('autocmd FileType python call PythonCompleteInit()')
-except ImportError, exc:
+except ImportError:
     sys.path.append(vim.eval('g:vim_monty_fallback_python_path'))
+    print sys.path
     try:
         import vim_monty
         reload(vim_monty)
         vim_monty.reload_submodules()
-        vim.command('autocmd FileType python call PythonCompleteInit()')
-    except ImportError:
+    except ImportError, exc:
         print "Deactivate vim-monty: %s" % exc
+        vim.command('return');
 eopython
 
-
-
-
-function! PythonCompleteInit()
   setlocal omnifunc=vim_monty#Complete
 
   if !exists('g:vim_monty_debug')

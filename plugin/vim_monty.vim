@@ -29,7 +29,6 @@ try:
     vim_monty.reload_submodules()
 except ImportError:
     sys.path.append(vim.eval('g:vim_monty_fallback_python_path'))
-    print sys.path
     try:
         import vim_monty
         reload(vim_monty)

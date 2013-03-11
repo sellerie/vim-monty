@@ -18,12 +18,13 @@ This project is in an early state and has many issues.
 Install
 =======
 
-If you use Vundle_, simply add this repository as Bundle to your vim
-configuration::
+If you use Vundle_, simply add this repository (`on github`_) as Bundle to
+your vim configuration::
 
    Bundle 'sellerie/vim-monty'
 
 .. _Vundle: https://github.com/gmarik/vundle
+.. _on github: https://github.com/sellerie/vim-monty
 
 
 The completion is based on logilab-astng library, so you need to install this

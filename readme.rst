@@ -1,3 +1,8 @@
+.. Warning::
+   I will not maintain this project anymore.
+   Use https://github.com/davidhalter/jedi-vim instead.
+
+
 =========================
 Python development in Vim
 =========================
